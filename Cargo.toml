@@ -1,0 +1,31 @@
+[package]
+name = "fundsp-rack"
+version = "0.1.0"
+edition = "2021"
+authors = ["PoHsuan Lai <pohsuanlai0208@gmail.com>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/PoHsuanLai/fundsp-rack"
+description = "Preset library for FunDSP: 30+ synths, 50+ effects, polyphony, and more"
+keywords = ["audio", "dsp", "synthesizer", "effects", "fundsp"]
+categories = ["multimedia::audio"]
+readme = "README.md"
+
+[dependencies]
+# Core audio DSP
+fundsp = { path = "../dawAI/dawai/fundsp", default-features = false, features = ["std"] }
+
+# Unique IDs for effects/synths
+uuid = { version = "1", features = ["v4"] }
+
+# Optional serialization
+serde = { version = "1.0", features = ["derive"], optional = true }
+serde_json = { version = "1.0", optional = true }
+
+[dev-dependencies]
+cpal = "0.15"
+anyhow = "1.0"
+hound = "3.5"
+
+[features]
+default = []
+serde = ["dep:serde", "dep:serde_json"]
