@@ -1,8 +1,6 @@
 //! Dynamics effects (limiter, compressor, normaliser)
 
-use super::super::registry::{
-    EffectBuilder, EffectCategory, EffectControls, EffectMetadata, ParameterDef,
-};
+use super::super::registry::{EffectBuilder, EffectControls, EffectMetadata};
 use super::super::sidechain::{SidechainCompressor, SidechainGate};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
@@ -21,26 +19,9 @@ impl EffectBuilder for LimiterBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "limiter".to_string(),
-            description: "Limiter (prevents clipping)".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "attack".to_string(),
-                    default: 0.01,
-                    min: 0.001,
-                    max: 0.1,
-                },
-                ParameterDef {
-                    name: "release".to_string(),
-                    default: 0.1,
-                    min: 0.01,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Dynamics,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("limiter", "Limiter (prevents clipping)")
+            .with_param("attack", 0.01, 0.001, 0.1)
+            .with_param("release", 0.1, 0.01, 1.0)
     }
 }
 
@@ -58,26 +39,9 @@ impl EffectBuilder for CompressorBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "compressor".to_string(),
-            description: "Compressor (reduces dynamic range)".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "attack".to_string(),
-                    default: 0.01,
-                    min: 0.001,
-                    max: 0.1,
-                },
-                ParameterDef {
-                    name: "release".to_string(),
-                    default: 0.1,
-                    min: 0.01,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Dynamics,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("compressor", "Compressor (reduces dynamic range)")
+            .with_param("attack", 0.01, 0.001, 0.1)
+            .with_param("release", 0.1, 0.01, 1.0)
     }
 }
 
@@ -92,13 +56,7 @@ impl EffectBuilder for NormaliserBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "normaliser".to_string(),
-            description: "Normaliser (automatic gain control)".to_string(),
-            parameters: vec![],
-            category: EffectCategory::Dynamics,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("normaliser", "Normaliser (automatic gain control)")
     }
 }
 
@@ -128,38 +86,11 @@ impl EffectBuilder for SidechainCompressorBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "sidechain_compressor".to_string(),
-            description: "Sidechain Compressor (compress based on external signal)".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "threshold".to_string(),
-                    default: -20.0,
-                    min: -60.0,
-                    max: 0.0,
-                },
-                ParameterDef {
-                    name: "ratio".to_string(),
-                    default: 4.0,
-                    min: 1.0,
-                    max: 20.0,
-                },
-                ParameterDef {
-                    name: "attack".to_string(),
-                    default: 0.01,
-                    min: 0.001,
-                    max: 0.1,
-                },
-                ParameterDef {
-                    name: "release".to_string(),
-                    default: 0.1,
-                    min: 0.01,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Dynamics,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("sidechain_compressor", "Sidechain Compressor (compress based on external signal)")
+            .with_param("threshold", -20.0, -60.0, 0.0)
+            .with_param("ratio", 4.0, 1.0, 20.0)
+            .with_param("attack", 0.01, 0.001, 0.1)
+            .with_param("release", 0.1, 0.01, 1.0)
     }
 }
 
@@ -187,32 +118,10 @@ impl EffectBuilder for SidechainGateBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "sidechain_gate".to_string(),
-            description: "Sidechain Gate (gate based on external signal)".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "threshold".to_string(),
-                    default: -40.0,
-                    min: -80.0,
-                    max: 0.0,
-                },
-                ParameterDef {
-                    name: "attack".to_string(),
-                    default: 0.001,
-                    min: 0.0001,
-                    max: 0.1,
-                },
-                ParameterDef {
-                    name: "release".to_string(),
-                    default: 0.05,
-                    min: 0.001,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Dynamics,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("sidechain_gate", "Sidechain Gate (gate based on external signal)")
+            .with_param("threshold", -40.0, -80.0, 0.0)
+            .with_param("attack", 0.001, 0.0001, 0.1)
+            .with_param("release", 0.05, 0.001, 1.0)
     }
 }
 

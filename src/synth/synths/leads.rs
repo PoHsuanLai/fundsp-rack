@@ -4,8 +4,7 @@
 //! - Lead: Classic mono lead with filter
 //! - Sub: Pure sub bass
 
-use crate::params::ParameterDef;
-use super::super::registry::{ SynthBuilder, SynthCategory, SynthMetadata, VoiceControls};
+use super::super::registry::{SynthBuilder, SynthMetadata, VoiceControls};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 
@@ -50,37 +49,12 @@ impl SynthBuilder for LeadSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "lead".to_string(),
-            description: "Classic mono lead synth".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "cutoff".to_string(),
-                    default: 2500.0,
-                    min: 100.0,
-                    max: 15000.0,
-                },
-                ParameterDef {
-                    name: "res".to_string(),
-                    default: 0.4,
-                    min: 0.0,
-                    max: 1.0,
-                },
-                ParameterDef {
-                    name: "glide".to_string(),
-                    default: 0.0,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: SynthCategory::Analog,
-        }
+        SynthMetadata::new("lead", "Classic mono lead synth")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("cutoff", 2500.0, 100.0, 15000.0)
+            .with_param("res", 0.4, 0.0, 1.0)
+            .with_param("glide", 0.0, 0.0, 1.0)
+            .with_tag("lead")
     }
 }
 
@@ -123,25 +97,11 @@ impl SynthBuilder for SubSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "sub".to_string(),
-            description: "Pure sub bass".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "shape".to_string(),
-                    default: 0.0,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: SynthCategory::Basic,
-        }
+        SynthMetadata::new("sub", "Pure sub bass")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("shape", 0.0, 0.0, 1.0)
+            .with_tag("bass")
+            .with_tag("sub")
     }
 }
 
@@ -170,7 +130,7 @@ impl SynthBuilder for BrassSynthBuilder {
             + (var_fn(&pitch_bend_shared, move |bend| freq * bend) >> saw())
             + (var_fn(&pitch_bend_shared, move |bend| freq * bend * (1.0 + detune)) >> saw());
 
-        let filtered = ( (brass * 0.33) | var(&cutoff_shared) | var(&resonance_shared)) >> moog();
+        let filtered = ((brass * 0.33) | var(&cutoff_shared) | var(&resonance_shared)) >> moog();
 
         let left = filtered.clone();
         let right = filtered;
@@ -188,30 +148,11 @@ impl SynthBuilder for BrassSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "brass".to_string(),
-            description: "Brass stab synth".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "cutoff".to_string(),
-                    default: 3000.0,
-                    min: 100.0,
-                    max: 15000.0,
-                },
-                ParameterDef {
-                    name: "res".to_string(),
-                    default: 0.3,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: SynthCategory::Analog,
-        }
+        SynthMetadata::new("brass", "Brass stab synth")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("cutoff", 3000.0, 100.0, 15000.0)
+            .with_param("res", 0.3, 0.0, 1.0)
+            .with_tag("lead")
+            .with_tag("brass")
     }
 }

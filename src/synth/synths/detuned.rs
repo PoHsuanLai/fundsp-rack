@@ -5,8 +5,7 @@
 //! - DPulseSynthBuilder: Detuned pulse/square waves
 //! - DTriSynthBuilder: Detuned triangle waves
 
-use crate::params::ParameterDef;
-use super::super::registry::{ SynthBuilder, SynthCategory, SynthMetadata, VoiceControls};
+use super::super::registry::{SynthBuilder, SynthMetadata, VoiceControls};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 
@@ -44,25 +43,10 @@ impl SynthBuilder for DSawSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "dsaw".to_string(),
-            description: "Detuned sawtooth waves".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "detune".to_string(),
-                    default: 0.1,
-                    min: 0.0,
-                    max: 0.5,
-                },
-            ],
-            category: SynthCategory::Analog,
-        }
+        SynthMetadata::new("dsaw", "Detuned sawtooth waves")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("detune", 0.1, 0.0, 0.5)
+            .with_tag("synth")
     }
 }
 
@@ -101,25 +85,10 @@ impl SynthBuilder for DPulseSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "dpulse".to_string(),
-            description: "Detuned pulse waves".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "detune".to_string(),
-                    default: 0.1,
-                    min: 0.0,
-                    max: 0.5,
-                },
-            ],
-            category: SynthCategory::Analog,
-        }
+        SynthMetadata::new("dpulse", "Detuned pulse waves")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("detune", 0.1, 0.0, 0.5)
+            .with_tag("synth")
     }
 }
 
@@ -158,24 +127,9 @@ impl SynthBuilder for DTriSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "dtri".to_string(),
-            description: "Detuned triangle waves".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "detune".to_string(),
-                    default: 0.1,
-                    min: 0.0,
-                    max: 0.5,
-                },
-            ],
-            category: SynthCategory::Analog,
-        }
+        SynthMetadata::new("dtri", "Detuned triangle waves")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("detune", 0.1, 0.0, 0.5)
+            .with_tag("synth")
     }
 }

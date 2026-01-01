@@ -1,13 +1,13 @@
 //! Effect chain for processing audio through multiple effects
 //!
 //! Provides an ordered chain of effects that can be applied to audio streams.
-use crate::metrics::CpuMeter;
-use crate::Result;
 use super::registry::{EffectControls, EffectRegistry};
 #[cfg(feature = "serde")]
 use super::serialize::{ChainState, EffectState};
 use super::sidechain::SidechainAwareEffect;
 use super::EffectId;
+use crate::metrics::CpuMeter;
+use crate::Result;
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -103,11 +103,7 @@ impl EffectChain {
     }
 
     /// Add an effect to the end of the chain by name
-    pub fn add_effect(
-        &mut self,
-        name: &str,
-        params: &HashMap<String, f32>,
-    ) -> Result<usize> {
+    pub fn add_effect(&mut self, name: &str, params: &HashMap<String, f32>) -> Result<usize> {
         if let Some(registry) = &self.registry {
             let (processor, controls) = registry.build(name, params)?;
             let metadata = registry.get_metadata(name).ok_or_else(|| {
@@ -146,11 +142,14 @@ impl EffectChain {
     ///
     /// # Example
     /// ```no_run
-    /// # use fundsp_effects::prelude::*;
+    /// # use fundsp_rack::prelude::*;
+    /// # fn main() -> fundsp_rack::Result<()> {
     /// let chain = EffectChain::new()
     ///     .registry(EffectRegistry::with_builtin())
     ///     .effect("lpf", &[("cutoff", 2000.0), ("res", 1.0)])?
     ///     .effect("reverb", &[])?;
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn effect(mut self, name: &str, params: &[(&str, f32)]) -> Result<Self> {
         let params_map: HashMap<String, f32> =
@@ -166,7 +165,8 @@ impl EffectChain {
     ///
     /// # Example
     /// ```no_run
-    /// # use fundsp_effects::prelude::*;
+    /// # use fundsp_rack::prelude::*;
+    /// # fn main() -> fundsp_rack::Result<()> {
     /// let mut chain = EffectChain::with_registry(EffectRegistry::with_builtin());
     /// chain
     ///     .add("chorus", &[("rate", 0.5), ("depth", 0.3)])?
@@ -174,6 +174,8 @@ impl EffectChain {
     ///
     /// // Can still use chain for processing
     /// let (out_l, out_r) = chain.process(0.5, 0.5);
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn add(&mut self, name: &str, params: &[(&str, f32)]) -> Result<&mut Self> {
         let params_map: HashMap<String, f32> =
@@ -501,7 +503,7 @@ impl EffectChain {
     ///
     /// # Example
     /// ```no_run
-    /// # use fundsp_effects::prelude::*;
+    /// # use fundsp_rack::prelude::*;
     /// # let chain = EffectChain::new();
     /// let json = chain.to_json().unwrap();
     /// std::fs::write("my_chain.json", json).unwrap();
@@ -518,7 +520,7 @@ impl EffectChain {
     ///
     /// # Example
     /// ```no_run
-    /// # use fundsp_effects::prelude::*;
+    /// # use fundsp_rack::prelude::*;
     /// # let mut chain = EffectChain::with_registry(EffectRegistry::with_builtin());
     /// let json = std::fs::read_to_string("my_chain.json").unwrap();
     /// chain.from_json(&json).unwrap();

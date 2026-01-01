@@ -70,12 +70,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn render(
-    filename: &str,
-    mut synth: Box<dyn AudioUnit>,
-    spec: &WavSpec,
-    secs: f32,
-) -> Result<()> {
+fn render(filename: &str, mut synth: Box<dyn AudioUnit>, spec: &WavSpec, secs: f32) -> Result<()> {
     synth.set_sample_rate(SAMPLE_RATE);
     synth.allocate();
     let mut writer = WavWriter::create(filename, *spec)?;

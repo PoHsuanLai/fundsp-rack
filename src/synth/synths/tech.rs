@@ -6,8 +6,7 @@
 //! - ZawaSynthBuilder: Buzzy, energetic saw + square mix
 //! - SubpulseSynthBuilder: Sub-bass pulse wave (one octave lower)
 
-use crate::params::ParameterDef;
-use super::super::registry::{ SynthBuilder, SynthCategory, SynthMetadata, VoiceControls};
+use super::super::registry::{SynthBuilder, SynthMetadata, VoiceControls};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 
@@ -48,17 +47,10 @@ impl SynthBuilder for TechSawsSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "tech_saws".to_string(),
-            description: "Tech/trance saws".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 1.0,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Digital,
-        }
+        SynthMetadata::new("tech_saws", "Tech/trance saws")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_tag("lead")
+            .with_tag("tech")
     }
 }
 
@@ -94,17 +86,10 @@ impl SynthBuilder for BladeSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "blade".to_string(),
-            description: "Sharp, cutting synth".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 1.0,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Digital,
-        }
+        SynthMetadata::new("blade", "Sharp, cutting synth")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_tag("lead")
+            .with_tag("tech")
     }
 }
 
@@ -141,17 +126,10 @@ impl SynthBuilder for ZawaSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "zawa".to_string(),
-            description: "Buzzy, energetic synth".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 1.0,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Digital,
-        }
+        SynthMetadata::new("zawa", "Buzzy, energetic synth")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_tag("lead")
+            .with_tag("tech")
     }
 }
 
@@ -188,16 +166,8 @@ impl SynthBuilder for SubpulseSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "subpulse".to_string(),
-            description: "Sub-bass pulse wave".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 1.0,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Analog,
-        }
+        SynthMetadata::new("subpulse", "Sub-bass pulse wave")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_tag("bass")
     }
 }

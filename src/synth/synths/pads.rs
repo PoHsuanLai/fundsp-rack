@@ -4,8 +4,7 @@
 //! - Strings: String ensemble pad
 //! - Pad: Generic warm pad
 
-use crate::params::ParameterDef;
-use super::super::registry::{ SynthBuilder, SynthCategory, SynthMetadata, VoiceControls};
+use super::super::registry::{SynthBuilder, SynthMetadata, VoiceControls};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 
@@ -29,14 +28,18 @@ impl SynthBuilder for StringsSynthBuilder {
 
         // String ensemble: multiple detuned saw waves with lowpass filter
         // Creates that lush, warm string sound
-        let strings = (var_fn(&pitch_bend_shared, move |bend| freq * bend * (1.0 - detune * 2.0)) >> saw())
+        let strings = (var_fn(&pitch_bend_shared, move |bend| {
+            freq * bend * (1.0 - detune * 2.0)
+        }) >> saw())
             + (var_fn(&pitch_bend_shared, move |bend| freq * bend * (1.0 - detune)) >> saw())
             + (var_fn(&pitch_bend_shared, move |bend| freq * bend) >> saw())
             + (var_fn(&pitch_bend_shared, move |bend| freq * bend * (1.0 + detune)) >> saw())
-            + (var_fn(&pitch_bend_shared, move |bend| freq * bend * (1.0 + detune * 2.0)) >> saw());
+            + (var_fn(&pitch_bend_shared, move |bend| {
+                freq * bend * (1.0 + detune * 2.0)
+            }) >> saw());
 
         // Apply lowpass filter for warmth
-        let filtered = ( (strings * 0.2) | var(&cutoff_shared) | dc(0.5)) >> lowpass();
+        let filtered = ((strings * 0.2) | var(&cutoff_shared) | dc(0.5)) >> lowpass();
 
         let left = filtered.clone();
         let right = filtered;
@@ -54,31 +57,12 @@ impl SynthBuilder for StringsSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "strings".to_string(),
-            description: "String ensemble pad".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "detune".to_string(),
-                    default: 0.003,
-                    min: 0.0,
-                    max: 0.02,
-                },
-                ParameterDef {
-                    name: "cutoff".to_string(),
-                    default: 3000.0,
-                    min: 100.0,
-                    max: 10000.0,
-                },
-            ],
-            category: SynthCategory::Analog,
-        }
+        SynthMetadata::new("strings", "String ensemble pad")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("detune", 0.003, 0.0, 0.02)
+            .with_param("cutoff", 3000.0, 100.0, 10000.0)
+            .with_tag("pad")
+            .with_tag("strings")
     }
 }
 
@@ -108,7 +92,7 @@ impl SynthBuilder for PadSynthBuilder {
             + (var_fn(&pitch_bend_shared, move |bend| freq * bend) >> triangle()) * tri_level
             + (var_fn(&pitch_bend_shared, move |bend| freq * 0.5 * bend) >> sine()) * 0.3; // Sub
 
-        let filtered = ( (pad * 0.4) | var(&cutoff_shared) | dc(0.3)) >> lowpass();
+        let filtered = ((pad * 0.4) | var(&cutoff_shared) | dc(0.3)) >> lowpass();
 
         let left = filtered.clone();
         let right = filtered;
@@ -126,30 +110,10 @@ impl SynthBuilder for PadSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "pad".to_string(),
-            description: "Warm pad synth".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "warmth".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 1.0,
-                },
-                ParameterDef {
-                    name: "cutoff".to_string(),
-                    default: 2000.0,
-                    min: 100.0,
-                    max: 10000.0,
-                },
-            ],
-            category: SynthCategory::Analog,
-        }
+        SynthMetadata::new("pad", "Warm pad synth")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("warmth", 0.5, 0.0, 1.0)
+            .with_param("cutoff", 2000.0, 100.0, 10000.0)
+            .with_tag("pad")
     }
 }

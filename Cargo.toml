@@ -21,6 +21,12 @@ uuid = { version = "1", features = ["v4"] }
 serde = { version = "1.0", features = ["derive"], optional = true }
 serde_json = { version = "1.0", optional = true }
 
+# SoundFont support (optional) - using fork with Clone support for FunDSP integration
+rustysynth = { git = "https://github.com/PoHsuanLai/rustysynth", optional = true }
+
+# Logging
+tracing = "0.1"
+
 [dev-dependencies]
 cpal = "0.15"
 anyhow = "1.0"
@@ -28,4 +34,5 @@ hound = "3.5"
 
 [features]
 default = []
-serde = ["dep:serde", "dep:serde_json"]
+serde = ["dep:serde", "dep:serde_json", "uuid/serde"]
+soundfont = ["dep:rustysynth"]

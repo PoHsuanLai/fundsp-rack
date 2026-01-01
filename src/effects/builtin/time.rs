@@ -1,8 +1,6 @@
 //! Time-based effects (reverb, delay, echo)
 
-use super::super::registry::{
-    EffectBuilder, EffectCategory, EffectControls, EffectMetadata, ParameterDef,
-};
+use super::super::registry::{EffectBuilder, EffectControls, EffectMetadata};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -20,26 +18,9 @@ impl EffectBuilder for ReverbBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "reverb".to_string(),
-            description: "Reverb effect".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "room".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 1.0,
-                },
-                ParameterDef {
-                    name: "time".to_string(),
-                    default: 1.0,
-                    min: 0.1,
-                    max: 10.0,
-                },
-            ],
-            category: EffectCategory::Time,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("reverb", "Reverb effect")
+            .with_param("room", 0.5, 0.0, 1.0)
+            .with_param("time", 1.0, 0.1, 10.0)
     }
 }
 
@@ -51,23 +32,13 @@ impl EffectBuilder for RoomReverbBuilder {
         let mix = params.get("mix").copied().unwrap_or(0.3);
         // Small room: short time, small size
         // Use & operator to branch input to dry/wet paths and sum outputs
-        let effect = (pass() | pass()) * (1.0 - mix) & reverb4_stereo(0.3, 0.5) * mix;
+        let effect = ((pass() | pass()) * (1.0 - mix)) & (reverb4_stereo(0.3, 0.5) * mix);
         (Box::new(effect), EffectControls::new())
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "room".to_string(),
-            description: "Small room reverb".to_string(),
-            parameters: vec![ParameterDef {
-                name: "mix".to_string(),
-                default: 0.3,
-                min: 0.0,
-                max: 1.0,
-            }],
-            category: EffectCategory::Time,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("room", "Small room reverb")
+            .with_param("mix", 0.3, 0.0, 1.0)
     }
 }
 
@@ -79,23 +50,13 @@ impl EffectBuilder for HallReverbBuilder {
         let mix = params.get("mix").copied().unwrap_or(0.4);
         // Large hall: long time, large size
         // Use & operator to branch input to dry/wet paths and sum outputs
-        let effect = (pass() | pass()) * (1.0 - mix) & reverb4_stereo(0.8, 3.0) * mix;
+        let effect = ((pass() | pass()) * (1.0 - mix)) & (reverb4_stereo(0.8, 3.0) * mix);
         (Box::new(effect), EffectControls::new())
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "hall".to_string(),
-            description: "Large hall reverb".to_string(),
-            parameters: vec![ParameterDef {
-                name: "mix".to_string(),
-                default: 0.4,
-                min: 0.0,
-                max: 1.0,
-            }],
-            category: EffectCategory::Time,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("hall", "Large hall reverb")
+            .with_param("mix", 0.4, 0.0, 1.0)
     }
 }
 
@@ -108,31 +69,14 @@ impl EffectBuilder for PlateReverbBuilder {
         let decay = params.get("decay").copied().unwrap_or(2.0);
         // Plate: medium size, longer decay, bright character
         // Use & operator to branch input to dry/wet paths and sum outputs
-        let effect = (pass() | pass()) * (1.0 - mix) & reverb4_stereo(0.5, decay) * mix;
+        let effect = ((pass() | pass()) * (1.0 - mix)) & (reverb4_stereo(0.5, decay) * mix);
         (Box::new(effect), EffectControls::new())
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "plate".to_string(),
-            description: "Plate reverb (bright, metallic)".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "mix".to_string(),
-                    default: 0.35,
-                    min: 0.0,
-                    max: 1.0,
-                },
-                ParameterDef {
-                    name: "decay".to_string(),
-                    default: 2.0,
-                    min: 0.5,
-                    max: 5.0,
-                },
-            ],
-            category: EffectCategory::Time,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("plate", "Plate reverb (bright, metallic)")
+            .with_param("mix", 0.35, 0.0, 1.0)
+            .with_param("decay", 2.0, 0.5, 5.0)
     }
 }
 
@@ -148,33 +92,16 @@ impl EffectBuilder for DelayBuilder {
         let delay_left = pass() >> fundsp::prelude::delay(time as f64);
         let delay_right = pass() >> fundsp::prelude::delay(time as f64);
 
-        let left = pass() * (1.0 - mix) & delay_left * mix;
-        let right = pass() * (1.0 - mix) & delay_right * mix;
+        let left = (pass() * (1.0 - mix)) & (delay_left * mix);
+        let right = (pass() * (1.0 - mix)) & (delay_right * mix);
 
         (Box::new(left | right), EffectControls::new())
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "delay".to_string(),
-            description: "Delay effect".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "time".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "mix".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Time,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("delay", "Delay effect")
+            .with_param("time", 0.5, 0.0, 2.0)
+            .with_param("mix", 0.5, 0.0, 1.0)
     }
 }
 
@@ -192,39 +119,17 @@ impl EffectBuilder for StereoDelayBuilder {
         let delay_left = pass() >> fundsp::prelude::delay(time_l as f64);
         let delay_right = pass() >> fundsp::prelude::delay(time_r as f64);
 
-        let left = pass() * (1.0 - mix) & delay_left * mix;
-        let right = pass() * (1.0 - mix) & delay_right * mix;
+        let left = (pass() * (1.0 - mix)) & (delay_left * mix);
+        let right = (pass() * (1.0 - mix)) & (delay_right * mix);
 
         (Box::new(left | right), EffectControls::new())
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "stereo_delay".to_string(),
-            description: "Stereo delay with independent L/R times".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "time_l".to_string(),
-                    default: 0.25,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "time_r".to_string(),
-                    default: 0.375,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "mix".to_string(),
-                    default: 0.4,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Time,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("stereo_delay", "Stereo delay with independent L/R times")
+            .with_param("time_l", 0.25, 0.0, 2.0)
+            .with_param("time_r", 0.375, 0.0, 2.0)
+            .with_param("mix", 0.4, 0.0, 1.0)
     }
 }
 
@@ -241,33 +146,16 @@ impl EffectBuilder for PingPongDelayBuilder {
         let delay_left = pass() >> fundsp::prelude::delay(time as f64);
         let delay_right = pass() >> fundsp::prelude::delay((time * 2.0) as f64);
 
-        let left = pass() * (1.0 - mix) & delay_left * mix;
-        let right = pass() * (1.0 - mix) & delay_right * mix;
+        let left = (pass() * (1.0 - mix)) & (delay_left * mix);
+        let right = (pass() * (1.0 - mix)) & (delay_right * mix);
 
         (Box::new(left | right), EffectControls::new())
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "ping_pong".to_string(),
-            description: "Ping-pong delay (bounces L-R)".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "time".to_string(),
-                    default: 0.25,
-                    min: 0.05,
-                    max: 1.0,
-                },
-                ParameterDef {
-                    name: "mix".to_string(),
-                    default: 0.4,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Time,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("ping_pong", "Ping-pong delay (bounces L-R)")
+            .with_param("time", 0.25, 0.05, 1.0)
+            .with_param("mix", 0.4, 0.0, 1.0)
     }
 }
 
@@ -283,33 +171,16 @@ impl EffectBuilder for SlapbackDelayBuilder {
         let delay_left = pass() >> fundsp::prelude::delay(time as f64);
         let delay_right = pass() >> fundsp::prelude::delay(time as f64);
 
-        let left = pass() * (1.0 - mix) & delay_left * mix;
-        let right = pass() * (1.0 - mix) & delay_right * mix;
+        let left = (pass() * (1.0 - mix)) & (delay_left * mix);
+        let right = (pass() * (1.0 - mix)) & (delay_right * mix);
 
         (Box::new(left | right), EffectControls::new())
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "slapback".to_string(),
-            description: "Slapback delay (short, punchy)".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "time".to_string(),
-                    default: 0.08,
-                    min: 0.03,
-                    max: 0.15,
-                },
-                ParameterDef {
-                    name: "mix".to_string(),
-                    default: 0.3,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Time,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("slapback", "Slapback delay (short, punchy)")
+            .with_param("time", 0.08, 0.03, 0.15)
+            .with_param("mix", 0.3, 0.0, 1.0)
     }
 }
 
@@ -322,26 +193,9 @@ impl EffectBuilder for EchoBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "echo".to_string(),
-            description: "Echo effect".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "time".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "mix".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Time,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("echo", "Echo effect")
+            .with_param("time", 0.5, 0.0, 2.0)
+            .with_param("mix", 0.5, 0.0, 1.0)
     }
 }
 

@@ -7,8 +7,7 @@
 //! - Triangle wave
 //! - Pulse wave
 
-use crate::params::ParameterDef;
-use super::super::registry::{ SynthBuilder, SynthCategory, SynthMetadata, VoiceControls};
+use super::super::registry::{SynthBuilder, SynthMetadata, VoiceControls};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 
@@ -42,17 +41,9 @@ impl SynthBuilder for SineSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "sine".to_string(),
-            description: "Simple sine wave oscillator".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 1.0,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Basic,
-        }
+        SynthMetadata::new("sine", "Simple sine wave oscillator")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_tag("synth")
     }
 }
 
@@ -86,17 +77,9 @@ impl SynthBuilder for SawSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "saw".to_string(),
-            description: "Sawtooth wave oscillator".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 1.0,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Basic,
-        }
+        SynthMetadata::new("saw", "Sawtooth wave oscillator")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_tag("synth")
     }
 }
 
@@ -130,17 +113,9 @@ impl SynthBuilder for SquareSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "square".to_string(),
-            description: "Square wave oscillator".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 1.0,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Basic,
-        }
+        SynthMetadata::new("square", "Square wave oscillator")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_tag("synth")
     }
 }
 
@@ -174,17 +149,9 @@ impl SynthBuilder for TriangleSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "tri".to_string(),
-            description: "Triangle wave oscillator".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 1.0,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Basic,
-        }
+        SynthMetadata::new("tri", "Triangle wave oscillator")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_tag("synth")
     }
 }
 
@@ -221,24 +188,9 @@ impl SynthBuilder for PulseSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "pulse".to_string(),
-            description: "Pulse wave oscillator".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "duty".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: SynthCategory::Basic,
-        }
+        SynthMetadata::new("pulse", "Pulse wave oscillator")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("duty", 0.5, 0.0, 1.0)
+            .with_tag("synth")
     }
 }

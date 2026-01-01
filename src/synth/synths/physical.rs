@@ -4,8 +4,7 @@
 //! - PianoSynthBuilder: Simple piano-like sound with harmonics
 //! - PluckSynthBuilder: Karplus-Strong plucked string algorithm
 
-use crate::params::ParameterDef;
-use super::super::registry::{ SynthBuilder, SynthCategory, SynthMetadata, VoiceControls};
+use super::super::registry::{SynthBuilder, SynthMetadata, VoiceControls};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 
@@ -45,17 +44,10 @@ impl SynthBuilder for PianoSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "piano".to_string(),
-            description: "Simple piano-like synth".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 1.0,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Physical,
-        }
+        SynthMetadata::new("piano", "Simple piano-like synth")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_tag("keys")
+            .with_tag("piano")
     }
 }
 
@@ -90,16 +82,8 @@ impl SynthBuilder for PluckSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "pluck".to_string(),
-            description: "Karplus-Strong plucked string".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 1.0,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Physical,
-        }
+        SynthMetadata::new("pluck", "Karplus-Strong plucked string")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_tag("pluck")
     }
 }

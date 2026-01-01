@@ -5,7 +5,7 @@
 //! # Examples
 //!
 //! ```
-//! use fundsp_effects::prelude::*;
+//! use fundsp_rack::prelude::*;
 //!
 //! // Simple effect creation
 //! let (effect, controls) = Effect::new("lpf")

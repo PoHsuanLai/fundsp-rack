@@ -1,8 +1,6 @@
 //! Distortion effects (distortion, bitcrusher, krush)
 
-use super::super::registry::{
-    EffectBuilder, EffectCategory, EffectControls, EffectMetadata, ParameterDef,
-};
+use super::super::registry::{EffectBuilder, EffectControls, EffectMetadata};
 use fundsp::hacker32::*;
 use numeric_array::typenum::U1;
 use std::collections::HashMap;
@@ -24,18 +22,8 @@ impl EffectBuilder for DistortionBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "distortion".to_string(),
-            description: "Distortion effect".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amount".to_string(),
-                default: 0.5,
-                min: 0.0,
-                max: 1.0,
-            }],
-            category: EffectCategory::Distortion,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("distortion", "Distortion effect")
+            .with_param("amount", 0.5, 0.0, 1.0)
     }
 }
 
@@ -55,18 +43,8 @@ impl EffectBuilder for BitcrusherBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "bitcrusher".to_string(),
-            description: "Bitcrusher (reduces bit depth)".to_string(),
-            parameters: vec![ParameterDef {
-                name: "bits".to_string(),
-                default: 8.0,
-                min: 1.0,
-                max: 16.0,
-            }],
-            category: EffectCategory::Distortion,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("bitcrusher", "Bitcrusher (reduces bit depth)")
+            .with_param("bits", 8.0, 1.0, 16.0)
     }
 }
 
@@ -90,18 +68,8 @@ impl EffectBuilder for PanBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "pan".to_string(),
-            description: "Pan (stereo positioning)".to_string(),
-            parameters: vec![ParameterDef {
-                name: "pan".to_string(),
-                default: 0.0,
-                min: -1.0,
-                max: 1.0,
-            }],
-            category: EffectCategory::Spatial,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("pan", "Pan (stereo positioning)")
+            .with_param("pan", 0.0, -1.0, 1.0)
     }
 }
 
@@ -140,32 +108,10 @@ impl EffectBuilder for KrushBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "krush".to_string(),
-            description: "Bit reduction and sample rate reduction".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "bits".to_string(),
-                    default: 8.0,
-                    min: 1.0,
-                    max: 16.0,
-                },
-                ParameterDef {
-                    name: "sample_rate".to_string(),
-                    default: 8000.0,
-                    min: 1000.0,
-                    max: 48000.0,
-                },
-                ParameterDef {
-                    name: "mix".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Distortion,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("krush", "Bit reduction and sample rate reduction")
+            .with_param("bits", 8.0, 1.0, 16.0)
+            .with_param("sample_rate", 8000.0, 1000.0, 48000.0)
+            .with_param("mix", 1.0, 0.0, 1.0)
     }
 }
 

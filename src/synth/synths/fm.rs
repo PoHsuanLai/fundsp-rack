@@ -3,8 +3,7 @@
 //! This module contains synth builders that use frequency modulation:
 //! - FMSynthBuilder: Simple FM synthesis with harmonic modulator relationship
 
-use crate::params::ParameterDef;
-use super::super::registry::{ SynthBuilder, SynthCategory, SynthMetadata, VoiceControls};
+use super::super::registry::{SynthBuilder, SynthMetadata, VoiceControls};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 
@@ -43,24 +42,10 @@ impl SynthBuilder for FMSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "fm".to_string(),
-            description: "FM synthesis".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "mod_index".to_string(),
-                    default: 2.0,
-                    min: 0.0,
-                    max: 10.0,
-                },
-            ],
-            category: SynthCategory::Digital,
-        }
+        SynthMetadata::new("fm", "FM synthesis")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("mod_index", 2.0, 0.0, 10.0)
+            .with_tag("fm")
+            .with_tag("synth")
     }
 }

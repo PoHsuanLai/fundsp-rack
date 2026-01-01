@@ -4,12 +4,20 @@
 //! in a serializable format.
 //!
 //! This module is only available with the `serde` feature enabled.
+//!
+//! ## Submodules
+//!
+//! - [`drums`] - Built-in drum presets (kick, snare, hihat, etc.)
 
-use crate::envelope::EnvelopeConfig;
-use crate::lfo::LFOConfig;
+pub mod drums;
+
+use crate::synth::envelope::EnvelopeConfig;
+use crate::synth::lfo::LFOConfig;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
+
+pub use drums::{drum_bank, midi_note_for_token, preset_for_token, DrumPresets, PresetBankDrumsExt};
 
 /// A complete synthesizer preset
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -109,7 +117,6 @@ impl SynthPreset {
     }
 
     /// Save preset to file
-    #[cfg(feature = "std")]
     pub fn save(&self, path: &std::path::Path) -> std::io::Result<()> {
         use std::fs::File;
         use std::io::Write;
@@ -121,7 +128,6 @@ impl SynthPreset {
     }
 
     /// Load preset from file
-    #[cfg(feature = "std")]
     pub fn load(path: &std::path::Path) -> std::io::Result<Self> {
         use std::fs;
 
@@ -190,7 +196,6 @@ impl PresetBank {
     }
 
     /// Save bank to file
-    #[cfg(feature = "std")]
     pub fn save(&self, path: &std::path::Path) -> std::io::Result<()> {
         use std::fs::File;
         use std::io::Write;
@@ -202,7 +207,6 @@ impl PresetBank {
     }
 
     /// Load bank from file
-    #[cfg(feature = "std")]
     pub fn load(path: &std::path::Path) -> std::io::Result<Self> {
         use std::fs;
 
@@ -214,7 +218,7 @@ impl PresetBank {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::envelope::ADSR;
+    use crate::synth::envelope::ADSR;
 
     #[test]
     fn test_preset_creation() {

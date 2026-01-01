@@ -26,8 +26,8 @@ fn main() -> anyhow::Result<()> {
     }
 
     // === Effects ===
-    let mut chain = EffectChain::with_registry(EffectRegistry::with_builtin())
-        .with_sample_rate(48000.0);
+    let mut chain =
+        EffectChain::with_registry(EffectRegistry::with_builtin()).with_sample_rate(48000.0);
 
     chain.add_effect("lpf", &[("cutoff".into(), 2000.0)].into())?;
     chain.add_effect("reverb", &Default::default())?;

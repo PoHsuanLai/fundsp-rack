@@ -1,8 +1,6 @@
 //! Other/special effects (slicer, wobble, ring_mod, octaver)
 
-use super::super::registry::{
-    EffectBuilder, EffectCategory, EffectControls, EffectMetadata, ParameterDef,
-};
+use super::super::registry::{EffectBuilder, EffectControls, EffectMetadata};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -46,32 +44,10 @@ impl EffectBuilder for SlicerBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "slicer".to_string(),
-            description: "Rhythmic gating/volume modulation".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "rate".to_string(),
-                    default: 8.0,
-                    min: 0.1,
-                    max: 100.0,
-                },
-                ParameterDef {
-                    name: "phase".to_string(),
-                    default: 0.0,
-                    min: 0.0,
-                    max: 1.0,
-                },
-                ParameterDef {
-                    name: "width".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Modulation,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("slicer", "Rhythmic gating/volume modulation")
+            .with_param("rate", 8.0, 0.1, 100.0)
+            .with_param("phase", 0.0, 0.0, 1.0)
+            .with_param("width", 0.5, 0.0, 1.0)
     }
 }
 
@@ -104,38 +80,11 @@ impl EffectBuilder for WobbleBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "wobble".to_string(),
-            description: "LFO filter sweep (dubstep-style)".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "rate".to_string(),
-                    default: 4.0,
-                    min: 0.1,
-                    max: 20.0,
-                },
-                ParameterDef {
-                    name: "min_cutoff".to_string(),
-                    default: 200.0,
-                    min: 50.0,
-                    max: 5000.0,
-                },
-                ParameterDef {
-                    name: "max_cutoff".to_string(),
-                    default: 2000.0,
-                    min: 100.0,
-                    max: 10000.0,
-                },
-                ParameterDef {
-                    name: "res".to_string(),
-                    default: 0.3,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Filter,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("wobble", "LFO filter sweep (dubstep-style)")
+            .with_param("rate", 4.0, 0.1, 20.0)
+            .with_param("min_cutoff", 200.0, 50.0, 5000.0)
+            .with_param("max_cutoff", 2000.0, 100.0, 10000.0)
+            .with_param("res", 0.3, 0.0, 1.0)
     }
 }
 
@@ -162,26 +111,9 @@ impl EffectBuilder for RingModBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "ring_mod".to_string(),
-            description: "Ring modulator for metallic tones".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "freq".to_string(),
-                    default: 440.0,
-                    min: 20.0,
-                    max: 5000.0,
-                },
-                ParameterDef {
-                    name: "mix".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Distortion,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("ring_mod", "Ring modulator for metallic tones")
+            .with_param("freq", 440.0, 20.0, 5000.0)
+            .with_param("mix", 0.5, 0.0, 1.0)
     }
 }
 
@@ -235,26 +167,9 @@ impl EffectBuilder for OctaverBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "octaver".to_string(),
-            description: "Adds octaves above or below".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "octave".to_string(),
-                    default: -1.0,
-                    min: -2.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "mix".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Other,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("octaver", "Adds octaves above or below")
+            .with_param("octave", -1.0, -2.0, 2.0)
+            .with_param("mix", 0.5, 0.0, 1.0)
     }
 }
 

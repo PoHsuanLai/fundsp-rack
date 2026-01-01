@@ -6,8 +6,7 @@
 //! - ModTriSynthBuilder: Modulated triangle wave
 //! - ModPulseSynthBuilder: Modulated pulse/square wave
 
-use crate::params::ParameterDef;
-use super::super::registry::{ SynthBuilder, SynthCategory, SynthMetadata, VoiceControls};
+use super::super::registry::{SynthBuilder, SynthMetadata, VoiceControls};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 
@@ -45,25 +44,10 @@ impl SynthBuilder for ModSawSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "mod_saw".to_string(),
-            description: "Modulated sawtooth wave".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "mod_freq".to_string(),
-                    default: 5.0,
-                    min: 0.1,
-                    max: 20.0,
-                },
-            ],
-            category: SynthCategory::Digital,
-        }
+        SynthMetadata::new("mod_saw", "Modulated sawtooth wave")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("mod_freq", 5.0, 0.1, 20.0)
+            .with_tag("synth")
     }
 }
 
@@ -100,25 +84,10 @@ impl SynthBuilder for ModSineSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "mod_sine".to_string(),
-            description: "Modulated sine wave".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "mod_freq".to_string(),
-                    default: 5.0,
-                    min: 0.1,
-                    max: 20.0,
-                },
-            ],
-            category: SynthCategory::Digital,
-        }
+        SynthMetadata::new("mod_sine", "Modulated sine wave")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("mod_freq", 5.0, 0.1, 20.0)
+            .with_tag("synth")
     }
 }
 
@@ -155,25 +124,10 @@ impl SynthBuilder for ModTriSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "mod_tri".to_string(),
-            description: "Modulated triangle wave".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "mod_freq".to_string(),
-                    default: 5.0,
-                    min: 0.1,
-                    max: 20.0,
-                },
-            ],
-            category: SynthCategory::Digital,
-        }
+        SynthMetadata::new("mod_tri", "Modulated triangle wave")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("mod_freq", 5.0, 0.1, 20.0)
+            .with_tag("synth")
     }
 }
 
@@ -210,24 +164,9 @@ impl SynthBuilder for ModPulseSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "mod_pulse".to_string(),
-            description: "Modulated pulse wave".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "mod_freq".to_string(),
-                    default: 5.0,
-                    min: 0.1,
-                    max: 20.0,
-                },
-            ],
-            category: SynthCategory::Digital,
-        }
+        SynthMetadata::new("mod_pulse", "Modulated pulse wave")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("mod_freq", 5.0, 0.1, 20.0)
+            .with_tag("synth")
     }
 }

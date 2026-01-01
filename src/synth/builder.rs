@@ -5,7 +5,7 @@
 //! # Examples
 //!
 //! ```
-//! use fundsp_synth::prelude::*;
+//! use fundsp_rack::prelude::*;
 //!
 //! // Simple synth creation
 //! let (synth, controls) = Synth::new("tb303")

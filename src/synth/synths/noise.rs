@@ -3,8 +3,7 @@
 //! This module contains synth builders for noise-based sounds:
 //! - NoiseSynthBuilder: White noise generator
 
-use crate::params::ParameterDef;
-use super::super::registry::{ SynthBuilder, SynthCategory, SynthMetadata, VoiceControls};
+use super::super::registry::{SynthBuilder, SynthMetadata, VoiceControls};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 
@@ -38,16 +37,8 @@ impl SynthBuilder for NoiseSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "noise".to_string(),
-            description: "White noise generator".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 1.0,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Noise,
-        }
+        SynthMetadata::new("noise", "White noise generator")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_tag("noise")
     }
 }

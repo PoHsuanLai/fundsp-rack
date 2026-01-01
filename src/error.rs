@@ -15,7 +15,11 @@ pub enum Error {
     /// Invalid parameter name
     InvalidParameter(String),
     /// Invalid parameter value
-    InvalidValue { param: String, value: f32, reason: String },
+    InvalidValue {
+        param: String,
+        value: f32,
+        reason: String,
+    },
     /// Effect chain error
     ChainError(String),
     /// Index out of bounds
@@ -23,6 +27,9 @@ pub enum Error {
     /// Serialization error
     #[cfg(feature = "serde")]
     SerializationError(String),
+    /// SoundFont loading/playback error
+    #[cfg(feature = "soundfont")]
+    SoundFontError(String),
 }
 
 impl fmt::Display for Error {
@@ -31,7 +38,11 @@ impl fmt::Display for Error {
             Error::InvalidSynth(name) => write!(f, "synth not found: '{}'", name),
             Error::InvalidEffect(name) => write!(f, "effect not found: '{}'", name),
             Error::InvalidParameter(name) => write!(f, "invalid parameter: '{}'", name),
-            Error::InvalidValue { param, value, reason } => {
+            Error::InvalidValue {
+                param,
+                value,
+                reason,
+            } => {
                 write!(f, "invalid value {} for '{}': {}", value, param, reason)
             }
             Error::ChainError(msg) => write!(f, "effect chain error: {}", msg),
@@ -40,6 +51,8 @@ impl fmt::Display for Error {
             }
             #[cfg(feature = "serde")]
             Error::SerializationError(msg) => write!(f, "serialization error: {}", msg),
+            #[cfg(feature = "soundfont")]
+            Error::SoundFontError(msg) => write!(f, "soundfont error: {}", msg),
         }
     }
 }

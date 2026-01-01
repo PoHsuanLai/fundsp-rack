@@ -6,8 +6,7 @@
 //! # Example
 //!
 //! ```rust,no_run
-//! use fundsp_synth::prelude::*;
-//! use fundsp_synth::poly::PolySynth;
+//! use fundsp_rack::prelude::*;
 //!
 //! // Create a polyphonic synth with 8 voices
 //! let mut poly = PolySynth::new("pad", 8);
@@ -69,6 +68,26 @@ impl PolySynth {
         Self::with_registry(synth_name, max_voices, SynthRegistry::with_builtin())
     }
 
+    /// Create a builder for a polyphonic synth with fluent API
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use fundsp_rack::prelude::*;
+    ///
+    /// let mut poly = PolySynth::builder("tb303")
+    ///     .voices(4)
+    ///     .cutoff(800.0)
+    ///     .res(0.7)
+    ///     .sample_rate(48000.0)
+    ///     .build();
+    ///
+    /// poly.note_on(36, 0.8); // Bass note
+    /// ```
+    pub fn builder(synth_name: &str) -> PolySynthBuilder<'_> {
+        PolySynthBuilder::new(synth_name)
+    }
+
     /// Create a new polyphonic synth with a custom registry
     pub fn with_registry(synth_name: &str, max_voices: usize, registry: SynthRegistry) -> Self {
         Self {
@@ -119,7 +138,9 @@ impl PolySynth {
             if voice.note.is_none() {
                 // Reuse this voice with new frequency
                 // We need to create a new unit since fundsp synths have fixed frequency
-                if let Ok((unit, controls)) = self.registry.create(&self.synth_name, freq, &self.params) {
+                if let Ok((unit, controls)) =
+                    self.registry.create(&self.synth_name, freq, &self.params)
+                {
                     voice.unit = unit;
                     voice.controls = controls;
                     voice.controls.amp.set(velocity);
@@ -136,7 +157,9 @@ impl PolySynth {
         // No free voice - either allocate a new one or steal the oldest
         if self.voices.len() < self.max_voices {
             // Allocate new voice
-            if let Ok((mut unit, controls)) = self.registry.create(&self.synth_name, freq, &self.params) {
+            if let Ok((mut unit, controls)) =
+                self.registry.create(&self.synth_name, freq, &self.params)
+            {
                 unit.set_sample_rate(self.sample_rate);
                 let voice = Voice {
                     unit,
@@ -151,13 +174,16 @@ impl PolySynth {
             }
         } else {
             // Voice stealing: find the oldest voice
-            let oldest_idx = self.voices
+            let oldest_idx = self
+                .voices
                 .iter()
                 .enumerate()
                 .min_by_key(|(_, v)| v.age)
                 .map(|(i, _)| i)?;
 
-            if let Ok((mut unit, controls)) = self.registry.create(&self.synth_name, freq, &self.params) {
+            if let Ok((mut unit, controls)) =
+                self.registry.create(&self.synth_name, freq, &self.params)
+            {
                 unit.set_sample_rate(self.sample_rate);
                 self.voices[oldest_idx] = Voice {
                     unit,
@@ -260,14 +286,31 @@ impl PolySynth {
 
     /// Get the currently playing notes
     pub fn playing_notes(&self) -> Vec<u8> {
-        self.voices
-            .iter()
-            .filter_map(|v| v.note)
-            .collect()
+        self.voices.iter().filter_map(|v| v.note).collect()
     }
 }
 
 /// Builder for creating polyphonic synths with a fluent API
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use fundsp_rack::prelude::*;
+///
+/// // Create a polyphonic pad synth with custom parameters
+/// let mut poly = PolySynth::builder("pad")
+///     .voices(8)
+///     .cutoff(2000.0)
+///     .res(0.5)
+///     .sample_rate(48000.0)
+///     .build();
+///
+/// // Or use the registry extension
+/// let registry = SynthRegistry::with_builtin();
+/// let mut poly = registry.poly("strings")
+///     .voices(6)
+///     .build();
+/// ```
 pub struct PolySynthBuilder<'a> {
     synth_name: &'a str,
     max_voices: usize,
@@ -288,13 +331,13 @@ impl<'a> PolySynthBuilder<'a> {
         }
     }
 
-    /// Set maximum number of voices
+    /// Set maximum number of voices (default: 8)
     pub fn voices(mut self, max_voices: usize) -> Self {
         self.max_voices = max_voices;
         self
     }
 
-    /// Set a synth parameter
+    /// Set a synth parameter by name
     pub fn param(mut self, name: &str, value: f32) -> Self {
         self.params.insert(name.to_string(), value);
         self
@@ -306,10 +349,57 @@ impl<'a> PolySynthBuilder<'a> {
         self
     }
 
-    /// Set the sample rate
+    /// Set the sample rate (default: 44100.0)
     pub fn sample_rate(mut self, sample_rate: f64) -> Self {
         self.sample_rate = sample_rate;
         self
+    }
+
+    // === Common parameter shortcuts ===
+
+    /// Set filter cutoff frequency (Hz)
+    pub fn cutoff(self, hz: f32) -> Self {
+        self.param("cutoff", hz)
+    }
+
+    /// Set filter resonance (0.0 to 1.0)
+    pub fn res(self, value: f32) -> Self {
+        self.param("res", value)
+    }
+
+    /// Set detune amount
+    pub fn detune(self, value: f32) -> Self {
+        self.param("detune", value)
+    }
+
+    /// Set FM modulation ratio
+    pub fn ratio(self, value: f32) -> Self {
+        self.param("ratio", value)
+    }
+
+    /// Set FM modulation index
+    pub fn index(self, value: f32) -> Self {
+        self.param("index", value)
+    }
+
+    /// Set attack time (seconds)
+    pub fn attack(self, value: f32) -> Self {
+        self.param("attack", value)
+    }
+
+    /// Set decay time (seconds)
+    pub fn decay(self, value: f32) -> Self {
+        self.param("decay", value)
+    }
+
+    /// Set sustain level (0.0 to 1.0)
+    pub fn sustain(self, value: f32) -> Self {
+        self.param("sustain", value)
+    }
+
+    /// Set release time (seconds)
+    pub fn release(self, value: f32) -> Self {
+        self.param("release", value)
     }
 
     /// Build the polyphonic synth
@@ -319,6 +409,22 @@ impl<'a> PolySynthBuilder<'a> {
         poly.params = self.params;
         poly.sample_rate = self.sample_rate;
         poly
+    }
+}
+
+// === Extension trait for SynthRegistry ===
+
+/// Extension trait for creating polyphonic synths from a registry
+pub trait SynthRegistryPolyExt {
+    /// Create a polyphonic synth builder for the given synth name
+    fn poly<'a>(&self, synth_name: &'a str) -> PolySynthBuilder<'a>;
+}
+
+impl SynthRegistryPolyExt for SynthRegistry {
+    fn poly<'a>(&self, synth_name: &'a str) -> PolySynthBuilder<'a> {
+        // We can't store a reference to self in the builder due to lifetime issues,
+        // so we'll create a fresh registry in build(). This is a limitation but works fine.
+        PolySynthBuilder::new(synth_name)
     }
 }
 

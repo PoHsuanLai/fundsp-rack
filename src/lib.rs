@@ -50,6 +50,8 @@ pub mod effects;
 pub mod error;
 pub mod metrics;
 pub mod params;
+#[cfg(feature = "soundfont")]
+pub mod soundfont;
 pub mod synth;
 
 // Re-export common types at crate root
@@ -67,18 +69,29 @@ pub mod prelude {
     // Synth
     pub use crate::synth::{
         midi_to_freq, EnvelopeConfig, FluentSynthBuilder, LFOConfig, LFOTarget, LFOWaveform,
-        PolySynth, PolySynthBuilder, Synth, SynthBuilder, SynthCategory, SynthMetadata,
-        SynthRegistry, SynthRegistryExt, VoiceControls, ADSR, AHD, AR,
+        PolySynth, PolySynthBuilder, Synth, SynthBuilder, SynthMetadata,
+        SynthRegistry, SynthRegistryExt, SynthRegistryPolyExt, VoiceControls, ADSR, AHD, AR,
     };
     #[cfg(feature = "serde")]
     pub use crate::synth::{PresetBank, SynthId, SynthPreset, Uuid};
 
     // Effects
+    #[cfg(feature = "serde")]
     pub use crate::effects::{
-        Effect, EffectBuilder, EffectCategory, EffectChain, EffectControls, EffectId,
-        EffectMetadata, EffectRegistry, EffectRegistryExt, FluentEffectBuilder, ParameterRange,
+        mastering_bank, mixing_bank, ChainState, EffectPreset, EffectPresetBank, EffectState,
+        MasteringPresets, MixingPresets, PresetBankMasteringExt, PresetBankMixingExt,
+    };
+    pub use crate::effects::{
+        Effect, EffectBuilder, EffectChain, EffectControls, EffectId, EffectMetadata,
+        EffectRegistry, EffectRegistryExt, FluentEffectBuilder, ParameterRange,
         SidechainAwareEffect, SmoothedParam, SmoothedParamBuilder,
     };
-    #[cfg(feature = "serde")]
-    pub use crate::effects::{ChainState, EffectState};
+
+    // SoundFont support (when enabled)
+    #[cfg(feature = "soundfont")]
+    pub use crate::soundfont::{
+        create_soundfont_synth, freq_to_midi, gm_drum_name, gm_program_name, register_gm_programs,
+        ChannelAllocator, SoundFontManager, SoundFontPlayer, SoundFontSynthBuilder,
+        SoundFontSynthHandle, SoundFontUnit, SoundFontVoice, GM_DRUM_NOTES, GM_PROGRAM_NAMES,
+    };
 }

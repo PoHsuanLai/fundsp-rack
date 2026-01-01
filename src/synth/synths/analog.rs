@@ -6,8 +6,7 @@
 //! - Supersaw
 //! - Hoover rave synth
 
-use crate::params::ParameterDef;
-use super::super::registry::{ SynthBuilder, SynthCategory, SynthMetadata, VoiceControls};
+use super::super::registry::{SynthBuilder, SynthMetadata, VoiceControls};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 
@@ -52,31 +51,12 @@ impl SynthBuilder for TB303SynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "tb303".to_string(),
-            description: "Classic TB-303 acid bass synth".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "cutoff".to_string(),
-                    default: 1000.0,
-                    min: 20.0,
-                    max: 20000.0,
-                },
-                ParameterDef {
-                    name: "res".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: SynthCategory::Analog,
-        }
+        SynthMetadata::new("tb303", "Classic TB-303 acid bass synth")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("cutoff", 1000.0, 20.0, 20000.0)
+            .with_param("res", 0.5, 0.0, 1.0)
+            .with_tag("bass")
+            .with_tag("acid")
     }
 }
 
@@ -126,31 +106,12 @@ impl SynthBuilder for ProphetSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "prophet".to_string(),
-            description: "Prophet-style analog synth".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "cutoff".to_string(),
-                    default: 2000.0,
-                    min: 20.0,
-                    max: 20000.0,
-                },
-                ParameterDef {
-                    name: "res".to_string(),
-                    default: 0.3,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: SynthCategory::Analog,
-        }
+        SynthMetadata::new("prophet", "Prophet-style analog synth")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("cutoff", 2000.0, 20.0, 20000.0)
+            .with_param("res", 0.3, 0.0, 1.0)
+            .with_tag("synth")
+            .with_tag("analog")
     }
 }
 
@@ -202,25 +163,11 @@ impl SynthBuilder for SupersawSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "supersaw".to_string(),
-            description: "Supersaw with detuned oscillators".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "detune".to_string(),
-                    default: 0.02,
-                    min: 0.0,
-                    max: 0.1,
-                },
-            ],
-            category: SynthCategory::Analog,
-        }
+        SynthMetadata::new("supersaw", "Supersaw with detuned oscillators")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("detune", 0.02, 0.0, 0.1)
+            .with_tag("lead")
+            .with_tag("trance")
     }
 }
 
@@ -287,30 +234,11 @@ impl SynthBuilder for HooverSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "hoover".to_string(),
-            description: "Hoover-style rave synth".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amp".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 2.0,
-                },
-                ParameterDef {
-                    name: "cutoff".to_string(),
-                    default: 1500.0,
-                    min: 20.0,
-                    max: 20000.0,
-                },
-                ParameterDef {
-                    name: "res".to_string(),
-                    default: 0.7,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: SynthCategory::Analog,
-        }
+        SynthMetadata::new("hoover", "Hoover-style rave synth")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_param("cutoff", 1500.0, 20.0, 20000.0)
+            .with_param("res", 0.7, 0.0, 1.0)
+            .with_tag("bass")
+            .with_tag("rave")
     }
 }

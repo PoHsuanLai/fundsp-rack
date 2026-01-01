@@ -5,8 +5,7 @@
 //! - GrowlSynthBuilder: Growling bass sound with low-frequency modulation
 //! - HollowSynthBuilder: Hollow, airy ambient sound with detuned sines
 
-use crate::params::ParameterDef;
-use super::super::registry::{ SynthBuilder, SynthCategory, SynthMetadata, VoiceControls};
+use super::super::registry::{SynthBuilder, SynthMetadata, VoiceControls};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 
@@ -45,17 +44,10 @@ impl SynthBuilder for DarkAmbienceSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "dark_ambience".to_string(),
-            description: "Dark ambient pad".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 0.5,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Analog,
-        }
+        SynthMetadata::new("dark_ambience", "Dark ambient pad")
+            .with_param("amp", 0.5, 0.0, 2.0)
+            .with_tag("pad")
+            .with_tag("ambient")
     }
 }
 
@@ -93,17 +85,9 @@ impl SynthBuilder for GrowlSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "growl".to_string(),
-            description: "Growling bass sound".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 1.0,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Analog,
-        }
+        SynthMetadata::new("growl", "Growling bass sound")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_tag("bass")
     }
 }
 
@@ -147,16 +131,9 @@ impl SynthBuilder for HollowSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "hollow".to_string(),
-            description: "Hollow, airy ambient sound".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 0.7,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Analog,
-        }
+        SynthMetadata::new("hollow", "Hollow, airy ambient sound")
+            .with_param("amp", 0.7, 0.0, 2.0)
+            .with_tag("pad")
+            .with_tag("ambient")
     }
 }

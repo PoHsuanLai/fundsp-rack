@@ -6,7 +6,7 @@
 //! 3. Render the result to WAV files
 
 use anyhow::Result;
-use fundsp::hacker32::*;
+use fundsp::prelude::AudioUnit;
 use fundsp_rack::prelude::*;
 use hound::{WavSpec, WavWriter};
 use std::sync::Arc;
@@ -27,11 +27,7 @@ fn main() -> Result<()> {
     // === Example 1: Pad synth with reverb and chorus ===
     println!("Rendering pad with reverb and chorus...");
     {
-        let (synth, _controls) = synth_registry
-            .synth("pad")
-            .freq(220.0)
-            .amp(0.3)
-            .build()?;
+        let (synth, _controls) = synth_registry.synth("pad").freq(220.0).amp(0.3).build()?;
 
         let mut chain = EffectChain::with_shared_registry(Arc::clone(&effect_registry))
             .with_sample_rate(SAMPLE_RATE);
@@ -57,7 +53,10 @@ fn main() -> Result<()> {
             .with_sample_rate(SAMPLE_RATE);
         chain
             .add("distortion", &[("drive", 3.0), ("mix", 0.5)])?
-            .add("ping_pong", &[("time", 0.3), ("feedback", 0.4), ("mix", 0.3)])?
+            .add(
+                "ping_pong",
+                &[("time", 0.3), ("feedback", 0.4), ("mix", 0.3)],
+            )?
             .add("lpf", &[("cutoff", 4000.0)])?;
 
         render_with_effects("output_tb303_fx.wav", synth, &mut chain, &spec, 4.0)?;
@@ -80,7 +79,15 @@ fn main() -> Result<()> {
             .add("chorus", &[("rate", 0.8), ("depth", 0.2)])?
             .add("eq_3band", &[("low", -2.0), ("mid", 1.0), ("high", 2.0)])?
             .add("compressor", &[("threshold", 0.5), ("ratio", 4.0)])?
-            .add("stereo_delay", &[("time_l", 0.25), ("time_r", 0.375), ("feedback", 0.3), ("mix", 0.25)])?
+            .add(
+                "stereo_delay",
+                &[
+                    ("time_l", 0.25),
+                    ("time_r", 0.375),
+                    ("feedback", 0.3),
+                    ("mix", 0.25),
+                ],
+            )?
             .add("plate", &[("mix", 0.2)])?;
 
         render_with_effects("output_supersaw_lead.wav", synth, &mut chain, &spec, 4.0)?;
@@ -105,16 +112,19 @@ fn main() -> Result<()> {
         render_with_effects("output_lofi_piano.wav", synth, &mut chain, &spec, 4.0)?;
     }
 
-    // === Example 5: Polyphonic strings with effects ===
+    // === Example 5: Polyphonic strings with effects (using PolySynth) ===
     println!("Rendering polyphonic strings with effects...");
     {
-        // Create a C major chord using multiple voices
-        let (c4, _) = synth_registry.synth("strings").note(60).amp(0.2).build()?;
-        let (e4, _) = synth_registry.synth("strings").note(64).amp(0.2).build()?;
-        let (g4, _) = synth_registry.synth("strings").note(67).amp(0.2).build()?;
+        // Create a polyphonic synth using the chainable builder API
+        let mut poly = PolySynth::builder("strings")
+            .voices(8)
+            .sample_rate(SAMPLE_RATE)
+            .build();
 
-        // Mix the chord
-        let chord = Box::new(Net::wrap(c4) + Net::wrap(e4) + Net::wrap(g4));
+        // Play a C major chord
+        poly.note_on(60, 0.8); // C4
+        poly.note_on(64, 0.8); // E4
+        poly.note_on(67, 0.8); // G4
 
         let mut chain = EffectChain::with_shared_registry(Arc::clone(&effect_registry))
             .with_sample_rate(SAMPLE_RATE);
@@ -123,7 +133,37 @@ fn main() -> Result<()> {
             .add("hall", &[("mix", 0.5)])?
             .add("stereo_width", &[("width", 1.5)])?;
 
-        render_with_effects("output_strings_chord.wav", chord, &mut chain, &spec, 5.0)?;
+        render_poly_with_effects(
+            "output_strings_chord.wav",
+            &mut poly,
+            &mut chain,
+            &spec,
+            5.0,
+        )?;
+    }
+
+    // === Example 6: Polyphonic FM bells ===
+    println!("Rendering polyphonic FM bells...");
+    {
+        let mut poly = PolySynth::builder("pretty_bell")
+            .voices(6)
+            .sample_rate(SAMPLE_RATE)
+            .build();
+
+        // Play an arpeggio-style chord
+        poly.note_on(72, 0.7); // C5
+        poly.note_on(76, 0.6); // E5
+        poly.note_on(79, 0.5); // G5
+        poly.note_on(84, 0.4); // C6
+
+        let mut chain = EffectChain::with_shared_registry(Arc::clone(&effect_registry))
+            .with_sample_rate(SAMPLE_RATE);
+        chain.add("plate", &[("mix", 0.4), ("decay", 3.0)])?.add(
+            "stereo_delay",
+            &[("time_l", 0.2), ("time_r", 0.3), ("mix", 0.2)],
+        )?;
+
+        render_poly_with_effects("output_fm_bells.wav", &mut poly, &mut chain, &spec, 6.0)?;
     }
 
     println!("\nRendered files:");
@@ -131,7 +171,8 @@ fn main() -> Result<()> {
     println!("  - output_tb303_fx.wav        (tb303 + distortion + ping-pong delay)");
     println!("  - output_supersaw_lead.wav   (supersaw + full lead chain)");
     println!("  - output_lofi_piano.wav      (electric piano + tape + lofi)");
-    println!("  - output_strings_chord.wav   (strings chord + chorus + hall)");
+    println!("  - output_strings_chord.wav   (polyphonic strings + chorus + hall)");
+    println!("  - output_fm_bells.wav        (polyphonic FM bells + plate + delay)");
 
     Ok(())
 }
@@ -153,6 +194,33 @@ fn render_with_effects(
     for _ in 0..total_samples {
         // Get audio from synth
         let (synth_l, synth_r) = synth.get_stereo();
+
+        // Process through effect chain
+        let (out_l, out_r) = chain.process(synth_l, synth_r);
+
+        // Write to file
+        writer.write_sample((out_l.clamp(-1.0, 1.0) * i16::MAX as f32) as i16)?;
+        writer.write_sample((out_r.clamp(-1.0, 1.0) * i16::MAX as f32) as i16)?;
+    }
+
+    writer.finalize()?;
+    Ok(())
+}
+
+/// Render a polyphonic synth through an effect chain to a WAV file
+fn render_poly_with_effects(
+    filename: &str,
+    poly: &mut PolySynth,
+    chain: &mut EffectChain,
+    spec: &WavSpec,
+    duration_secs: f32,
+) -> Result<()> {
+    let mut writer = WavWriter::create(filename, *spec)?;
+    let total_samples = (SAMPLE_RATE * duration_secs as f64) as usize;
+
+    for _ in 0..total_samples {
+        // Get audio from polyphonic synth
+        let (synth_l, synth_r) = poly.get_stereo();
 
         // Process through effect chain
         let (out_l, out_r) = chain.process(synth_l, synth_r);

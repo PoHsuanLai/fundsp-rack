@@ -4,7 +4,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Parameter definition with name, default value, and range
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct ParameterDef {
     pub name: String,

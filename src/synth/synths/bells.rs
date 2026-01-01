@@ -4,8 +4,7 @@
 //! - PrettyBellSynthBuilder: Bell sound with inharmonic partials
 //! - DullBellSynthBuilder: Duller bell using triangle wave base
 
-use crate::params::ParameterDef;
-use super::super::registry::{ SynthBuilder, SynthCategory, SynthMetadata, VoiceControls};
+use super::super::registry::{SynthBuilder, SynthMetadata, VoiceControls};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 
@@ -47,17 +46,10 @@ impl SynthBuilder for PrettyBellSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "pretty_bell".to_string(),
-            description: "Pretty bell sound".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 1.0,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Physical,
-        }
+        SynthMetadata::new("pretty_bell", "Pretty bell sound")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_tag("bell")
+            .with_tag("keys")
     }
 }
 
@@ -97,16 +89,9 @@ impl SynthBuilder for DullBellSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "dull_bell".to_string(),
-            description: "Dull bell sound".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 1.0,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Physical,
-        }
+        SynthMetadata::new("dull_bell", "Dull bell sound")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_tag("bell")
+            .with_tag("keys")
     }
 }

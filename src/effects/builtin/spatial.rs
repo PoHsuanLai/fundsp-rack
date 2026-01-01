@@ -1,8 +1,6 @@
 //! Spatial effects (pan)
 
-use super::super::registry::{
-    EffectBuilder, EffectCategory, EffectControls, EffectMetadata, ParameterDef,
-};
+use super::super::registry::{EffectBuilder, EffectControls, EffectMetadata};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -27,18 +25,8 @@ impl EffectBuilder for PanBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "pan".to_string(),
-            description: "Pan (stereo positioning)".to_string(),
-            parameters: vec![ParameterDef {
-                name: "pan".to_string(),
-                default: 0.0,
-                min: -1.0,
-                max: 1.0,
-            }],
-            category: EffectCategory::Spatial,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("pan", "Pan (stereo positioning)")
+            .with_param("pan", 0.0, -1.0, 1.0)
     }
 }
 
@@ -96,18 +84,8 @@ impl EffectBuilder for StereoWidenerBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "stereo_widener".to_string(),
-            description: "Stereo Widener (adjusts stereo width)".to_string(),
-            parameters: vec![ParameterDef {
-                name: "width".to_string(),
-                default: 1.0,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: EffectCategory::Spatial,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("stereo_widener", "Stereo Widener (adjusts stereo width)")
+            .with_param("width", 1.0, 0.0, 2.0)
     }
 }
 

@@ -43,12 +43,17 @@ pub struct VoiceControls {
 }
 
 /// Metadata about a synth
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub struct SynthMetadata {
     pub name: String,
     pub description: String,
     pub parameters: Vec<ParameterDef>,
-    pub category: SynthCategory,
+    /// Tags for categorization and source tracking
+    /// Examples: "bass", "lead", "pad", "source:builtin", "source:vst3"
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub tags: Vec<String>,
 }
 
 impl SynthMetadata {
@@ -56,39 +61,42 @@ impl SynthMetadata {
     pub fn new(
         name: impl Into<String>,
         description: impl Into<String>,
-        category: SynthCategory,
     ) -> Self {
         Self {
             name: name.into(),
             description: description.into(),
             parameters: vec![],
-            category,
+            tags: vec![],
         }
     }
 
     /// Add a parameter definition
     pub fn with_param(mut self, name: impl Into<String>, default: f32, min: f32, max: f32) -> Self {
-        self.parameters.push(ParameterDef::new(name, default, min, max));
+        self.parameters
+            .push(ParameterDef::new(name, default, min, max));
         self
+    }
+
+    /// Add a tag
+    pub fn with_tag(mut self, tag: impl Into<String>) -> Self {
+        self.tags.push(tag.into());
+        self
+    }
+
+    /// Add multiple tags
+    pub fn with_tags(mut self, tags: impl IntoIterator<Item = impl Into<String>>) -> Self {
+        self.tags.extend(tags.into_iter().map(|t| t.into()));
+        self
+    }
+
+    /// Check if this synth has a specific tag
+    pub fn has_tag(&self, tag: &str) -> bool {
+        self.tags.iter().any(|t| t.eq_ignore_ascii_case(tag))
     }
 }
 
-/// Synth categories
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SynthCategory {
-    /// Basic waveforms (sine, saw, square)
-    Basic,
-    /// Analog-style synths (tb303, prophet, juno)
-    Analog,
-    /// Digital synths (fm, wavetable)
-    Digital,
-    /// Physical modeling (pluck, piano, organ)
-    Physical,
-    /// Noise generators
-    Noise,
-}
-
 /// Registry for all available synths
+#[derive(Clone)]
 pub struct SynthRegistry {
     builders: HashMap<String, Arc<dyn SynthBuilder>>,
 }
@@ -231,6 +239,110 @@ impl SynthRegistry {
     /// Check if a synth exists
     pub fn contains(&self, name: &str) -> bool {
         self.builders.contains_key(name)
+    }
+
+    /// Find synths by tag
+    ///
+    /// Returns a list of synth names that have the specified tag.
+    pub fn find_by_tag(&self, tag: &str) -> Vec<String> {
+        self.builders
+            .iter()
+            .filter(|(_, builder)| builder.metadata().has_tag(tag))
+            .map(|(name, _)| name.clone())
+            .collect()
+    }
+
+    /// Get the first synth that matches a tag, or a fallback if none found
+    ///
+    /// Useful for MIDI program change where we need a single synth for a category.
+    pub fn first_with_tag(&self, tag: &str) -> Option<String> {
+        self.find_by_tag(tag).into_iter().next()
+    }
+
+    /// Get a synth for a General MIDI program number (0-127)
+    ///
+    /// Priority order:
+    /// 1. SoundFont-based synth (sf_*) if available - provides realistic samples
+    /// 2. Tag-based lookup for synthesis fallback
+    /// 3. Ultimate fallback to "sine"
+    pub fn synth_for_gm_program(&self, program: u8) -> String {
+        // First, try to find a SoundFont-based synth for this program
+        // SoundFont synths are registered with "sf_" prefix and have the "soundfont" tag
+        let sf_synths = self.find_by_tag("soundfont");
+        if !sf_synths.is_empty() {
+            // SoundFont synths are available - find the one for this program
+            // They're registered as sf_{program_name} with program-specific metadata
+            for synth_name in &sf_synths {
+                if let Some(builder) = self.get(synth_name) {
+                    let meta = builder.metadata();
+                    // Check if the description contains this program number
+                    if meta.description.contains(&format!("GM Program {}", program)) {
+                        return synth_name.clone();
+                    }
+                }
+            }
+        }
+
+        // Fallback to tag-based synthesis
+        let (primary_tag, fallback_tags): (&str, &[&str]) = match program {
+            // Piano (1-8)
+            0..=7 => ("piano", &["keys", "synth"]),
+            // Chromatic Percussion (9-16)
+            8..=15 => ("bell", &["keys", "synth"]),
+            // Organ (17-24)
+            16..=23 => ("organ", &["keys", "synth"]),
+            // Guitar (25-32)
+            24..=31 => ("pluck", &["synth"]),
+            // Bass (33-40)
+            32..=39 => ("bass", &["sub", "synth"]),
+            // Strings (41-48)
+            40..=47 => ("strings", &["pad", "synth"]),
+            // Ensemble (49-56)
+            48..=55 => ("pad", &["strings", "synth"]),
+            // Brass (56-64)
+            56..=63 => ("brass", &["lead", "synth"]),
+            // Reed (65-72)
+            64..=71 => ("lead", &["synth"]), // No reed tag, use lead
+            // Pipe (73-80)
+            72..=79 => ("synth", &[]), // No specific pipe, use basic synth
+            // Synth Lead (81-88)
+            80..=87 => ("lead", &["synth"]),
+            // Synth Pad (89-96)
+            88..=95 => ("pad", &["ambient", "strings"]),
+            // Synth Effects (97-104)
+            96..=103 => ("fm", &["synth"]),
+            // Ethnic (105-112)
+            104..=111 => ("pluck", &["synth"]),
+            // Percussive (113-120)
+            112..=119 => ("drum", &["noise", "synth"]),
+            // Sound Effects (121-128)
+            120..=127 => ("noise", &["synth"]),
+            _ => ("synth", &[]),
+        };
+
+        // Try primary tag first (excluding soundfont synths for cleaner fallback)
+        for synth_name in self.find_by_tag(primary_tag) {
+            if !synth_name.starts_with("sf_") {
+                return synth_name;
+            }
+        }
+
+        // Try fallback tags
+        for tag in fallback_tags {
+            for synth_name in self.find_by_tag(tag) {
+                if !synth_name.starts_with("sf_") {
+                    return synth_name;
+                }
+            }
+        }
+
+        // Ultimate fallback
+        "sine".to_string()
+    }
+
+    /// Check if SoundFont synths are registered
+    pub fn has_soundfont_synths(&self) -> bool {
+        !self.find_by_tag("soundfont").is_empty()
     }
 }
 

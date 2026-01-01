@@ -1,8 +1,6 @@
 //! Modulation effects (chorus, flanger, tremolo)
 
-use super::super::registry::{
-    EffectBuilder, EffectCategory, EffectControls, EffectMetadata, ParameterDef,
-};
+use super::super::registry::{EffectBuilder, EffectControls, EffectMetadata};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -23,32 +21,10 @@ impl EffectBuilder for ChorusBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "chorus".to_string(),
-            description: "Chorus effect".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "separation".to_string(),
-                    default: 0.02,
-                    min: 0.0,
-                    max: 0.1,
-                },
-                ParameterDef {
-                    name: "variation".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 1.0,
-                },
-                ParameterDef {
-                    name: "mod_frequency".to_string(),
-                    default: 0.5,
-                    min: 0.1,
-                    max: 10.0,
-                },
-            ],
-            category: EffectCategory::Modulation,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("chorus", "Chorus effect")
+            .with_param("separation", 0.02, 0.0, 0.1)
+            .with_param("variation", 0.5, 0.0, 1.0)
+            .with_param("mod_frequency", 0.5, 0.1, 10.0)
     }
 }
 
@@ -75,26 +51,9 @@ impl EffectBuilder for FlangerBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "flanger".to_string(),
-            description: "Flanger effect".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "depth".to_string(),
-                    default: 0.005,
-                    min: 0.0,
-                    max: 0.02,
-                },
-                ParameterDef {
-                    name: "rate".to_string(),
-                    default: 0.5,
-                    min: 0.1,
-                    max: 10.0,
-                },
-            ],
-            category: EffectCategory::Modulation,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("flanger", "Flanger effect")
+            .with_param("depth", 0.005, 0.0, 0.02)
+            .with_param("rate", 0.5, 0.1, 10.0)
     }
 }
 
@@ -119,26 +78,9 @@ impl EffectBuilder for TremoloBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "tremolo".to_string(),
-            description: "Tremolo (amplitude modulation)".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "rate".to_string(),
-                    default: 4.0,
-                    min: 0.1,
-                    max: 20.0,
-                },
-                ParameterDef {
-                    name: "depth".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Modulation,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("tremolo", "Tremolo (amplitude modulation)")
+            .with_param("rate", 4.0, 0.1, 20.0)
+            .with_param("depth", 0.5, 0.0, 1.0)
     }
 }
 
@@ -176,38 +118,11 @@ impl EffectBuilder for PhaserBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "phaser".to_string(),
-            description: "Phaser (sweeping notch filter)".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "rate".to_string(),
-                    default: 0.5,
-                    min: 0.1,
-                    max: 10.0,
-                },
-                ParameterDef {
-                    name: "depth".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 1.0,
-                },
-                ParameterDef {
-                    name: "feedback".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 0.95,
-                },
-                ParameterDef {
-                    name: "stages".to_string(),
-                    default: 4.0,
-                    min: 2.0,
-                    max: 12.0,
-                },
-            ],
-            category: EffectCategory::Modulation,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("phaser", "Phaser (sweeping notch filter)")
+            .with_param("rate", 0.5, 0.1, 10.0)
+            .with_param("depth", 0.5, 0.0, 1.0)
+            .with_param("feedback", 0.5, 0.0, 0.95)
+            .with_param("stages", 4.0, 2.0, 12.0)
     }
 }
 
@@ -247,26 +162,10 @@ impl EffectBuilder for VibratoBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "vibrato".to_string(),
-            description: "Vibrato (pitch modulation)".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "rate".to_string(),
-                    default: 5.0,
-                    min: 0.5,
-                    max: 20.0,
-                },
-                ParameterDef {
-                    name: "depth".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Modulation,
-            latency_samples: 441, // ~10ms at 44.1kHz
-        }
+        EffectMetadata::new("vibrato", "Vibrato (pitch modulation)")
+            .with_param("rate", 5.0, 0.5, 20.0)
+            .with_param("depth", 0.5, 0.0, 1.0)
+            .with_latency(441) // ~10ms at 44.1kHz
     }
 }
 

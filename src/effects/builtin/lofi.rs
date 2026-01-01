@@ -1,8 +1,6 @@
 //! Lo-fi effects (tape saturation, vinyl, etc.)
 
-use super::super::registry::{
-    EffectBuilder, EffectCategory, EffectControls, EffectMetadata, ParameterDef,
-};
+use super::super::registry::{EffectBuilder, EffectControls, EffectMetadata};
 use fundsp::hacker32::*;
 use numeric_array::typenum::U1;
 use std::collections::HashMap;
@@ -22,47 +20,23 @@ impl EffectBuilder for TapeSaturationBuilder {
         let filter_cutoff = 15000.0 - warmth * 10000.0; // More warmth = lower cutoff
 
         // Soft saturation using tanh
-        let saturate_left = (pass() * saturation_amount)
-            >> shape(Tanh(1.0))
-            >> lowpole_hz(filter_cutoff);
-        let saturate_right = (pass() * saturation_amount)
-            >> shape(Tanh(1.0))
-            >> lowpole_hz(filter_cutoff);
+        let saturate_left =
+            (pass() * saturation_amount) >> shape(Tanh(1.0)) >> lowpole_hz(filter_cutoff);
+        let saturate_right =
+            (pass() * saturation_amount) >> shape(Tanh(1.0)) >> lowpole_hz(filter_cutoff);
 
         // Mix dry and wet using & operator to branch and sum
-        let left = pass() * (1.0 - mix) & saturate_left * mix;
-        let right = pass() * (1.0 - mix) & saturate_right * mix;
+        let left = (pass() * (1.0 - mix)) & (saturate_left * mix);
+        let right = (pass() * (1.0 - mix)) & (saturate_right * mix);
 
         (Box::new(left | right), EffectControls::new())
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "tape_saturation".to_string(),
-            description: "Tape saturation (warm analog feel)".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "drive".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 1.0,
-                },
-                ParameterDef {
-                    name: "warmth".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 1.0,
-                },
-                ParameterDef {
-                    name: "mix".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Distortion,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("tape_saturation", "Tape saturation (warm analog feel)")
+            .with_param("drive", 0.5, 0.0, 1.0)
+            .with_param("warmth", 0.5, 0.0, 1.0)
+            .with_param("mix", 1.0, 0.0, 1.0)
     }
 }
 
@@ -93,33 +67,16 @@ impl EffectBuilder for LofiBuilder {
             >> lowpole_hz(filter_cutoff);
 
         // Mix dry and wet using & operator to branch and sum
-        let left = pass() * (1.0 - mix) & lofi_left * mix;
-        let right = pass() * (1.0 - mix) & lofi_right * mix;
+        let left = (pass() * (1.0 - mix)) & (lofi_left * mix);
+        let right = (pass() * (1.0 - mix)) & (lofi_right * mix);
 
         (Box::new(left | right), EffectControls::new())
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "lofi".to_string(),
-            description: "Lo-fi effect (retro degradation)".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "amount".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 1.0,
-                },
-                ParameterDef {
-                    name: "mix".to_string(),
-                    default: 1.0,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Distortion,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("lofi", "Lo-fi effect (retro degradation)")
+            .with_param("amount", 0.5, 0.0, 1.0)
+            .with_param("mix", 1.0, 0.0, 1.0)
     }
 }
 
@@ -139,13 +96,9 @@ impl EffectBuilder for VinylBuilder {
         let filter_cutoff = 12000.0 - warmth * 6000.0;
 
         // Add noise and filter
-        let vinyl_left = pass()
-            >> lowpole_hz(filter_cutoff)
-            >> highpole_hz(30.0); // Remove sub-bass rumble
+        let vinyl_left = pass() >> lowpole_hz(filter_cutoff) >> highpole_hz(30.0); // Remove sub-bass rumble
 
-        let vinyl_right = pass()
-            >> lowpole_hz(filter_cutoff)
-            >> highpole_hz(30.0);
+        let vinyl_right = pass() >> lowpole_hz(filter_cutoff) >> highpole_hz(30.0);
 
         // Add hiss (filtered noise)
         let hiss_level = hiss * 0.02;
@@ -156,32 +109,10 @@ impl EffectBuilder for VinylBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "vinyl".to_string(),
-            description: "Vinyl record effect".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "crackle".to_string(),
-                    default: 0.3,
-                    min: 0.0,
-                    max: 1.0,
-                },
-                ParameterDef {
-                    name: "hiss".to_string(),
-                    default: 0.2,
-                    min: 0.0,
-                    max: 1.0,
-                },
-                ParameterDef {
-                    name: "warmth".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 1.0,
-                },
-            ],
-            category: EffectCategory::Other,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("vinyl", "Vinyl record effect")
+            .with_param("crackle", 0.3, 0.0, 1.0)
+            .with_param("hiss", 0.2, 0.0, 1.0)
+            .with_param("warmth", 0.5, 0.0, 1.0)
     }
 }
 

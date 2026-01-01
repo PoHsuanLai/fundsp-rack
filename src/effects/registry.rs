@@ -12,25 +12,6 @@ use fundsp::shared::Shared;
 use std::collections::HashMap;
 use std::sync::Arc;
 
-/// Effect category for organization
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum EffectCategory {
-    /// Time-based effects (reverb, delay, echo)
-    Time,
-    /// Modulation effects (chorus, flanger, phaser)
-    Modulation,
-    /// Filter effects (lowpass, highpass, bandpass)
-    Filter,
-    /// Dynamics effects (compressor, limiter, gate)
-    Dynamics,
-    /// Distortion effects (overdrive, fuzz, bitcrusher)
-    Distortion,
-    /// Spatial effects (panning, stereo width)
-    Spatial,
-    /// Other/utility effects
-    Other,
-}
-
 /// Trait for building custom effects
 pub trait EffectBuilder: Send + Sync {
     /// Build the effect with given parameters
@@ -76,35 +57,36 @@ impl Default for EffectControls {
 }
 
 /// Metadata about an effect
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EffectMetadata {
     pub name: String,
     pub description: String,
     pub parameters: Vec<ParameterDef>,
-    pub category: EffectCategory,
     /// Latency introduced by this effect (in samples)
     pub latency_samples: usize,
+    /// Tags for categorization and source tracking
+    /// Examples: "filter", "dynamics", "delay", "source:builtin", "source:vst3"
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub tags: Vec<String>,
 }
 
 impl EffectMetadata {
     /// Create new metadata with no parameters and zero latency
-    pub fn new(
-        name: impl Into<String>,
-        description: impl Into<String>,
-        category: EffectCategory,
-    ) -> Self {
+    pub fn new(name: impl Into<String>, description: impl Into<String>) -> Self {
         Self {
             name: name.into(),
             description: description.into(),
             parameters: vec![],
-            category,
             latency_samples: 0,
+            tags: vec![],
         }
     }
 
     /// Add a parameter definition
     pub fn with_param(mut self, name: impl Into<String>, default: f32, min: f32, max: f32) -> Self {
-        self.parameters.push(ParameterDef::new(name, default, min, max));
+        self.parameters
+            .push(ParameterDef::new(name, default, min, max));
         self
     }
 
@@ -113,16 +95,35 @@ impl EffectMetadata {
         self.latency_samples = samples;
         self
     }
+
+    /// Add a tag
+    pub fn with_tag(mut self, tag: impl Into<String>) -> Self {
+        self.tags.push(tag.into());
+        self
+    }
+
+    /// Add multiple tags
+    pub fn with_tags(mut self, tags: impl IntoIterator<Item = impl Into<String>>) -> Self {
+        self.tags.extend(tags.into_iter().map(|t| t.into()));
+        self
+    }
+
+    /// Check if this effect has a specific tag
+    pub fn has_tag(&self, tag: &str) -> bool {
+        self.tags.iter().any(|t| t.eq_ignore_ascii_case(tag))
+    }
 }
 
 /// Parameter range
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ParameterRange {
     pub min: f32,
     pub max: f32,
 }
 
 /// Effect registry for managing available effects
+#[derive(Clone)]
 pub struct EffectRegistry {
     builders: HashMap<String, Arc<dyn EffectBuilder>>,
 }
@@ -196,14 +197,6 @@ impl EffectRegistry {
         self.builders
             .values()
             .map(|builder| builder.metadata())
-            .collect()
-    }
-
-    /// List effects by category
-    pub fn list_by_category(&self, category: EffectCategory) -> Vec<EffectMetadata> {
-        self.list_effects()
-            .into_iter()
-            .filter(|meta| meta.category == category)
             .collect()
     }
 }

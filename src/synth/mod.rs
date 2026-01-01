@@ -20,10 +20,12 @@ pub mod synths;
 pub use builder::{Synth, SynthBuilder as FluentSynthBuilder, SynthRegistryExt};
 pub use envelope::{EnvelopeConfig, ADSR, AHD, AR};
 pub use lfo::{LFOConfig, LFOTarget, LFOWaveform};
-pub use poly::{midi_to_freq, PolySynth, PolySynthBuilder};
+pub use poly::{midi_to_freq, PolySynth, PolySynthBuilder, SynthRegistryPolyExt};
 #[cfg(feature = "serde")]
-pub use preset::{PresetBank, SynthPreset};
-pub use registry::{SynthBuilder, SynthCategory, SynthMetadata, SynthRegistry, VoiceControls};
+pub use preset::{
+    drum_bank, midi_note_for_token, preset_for_token, DrumPresets, PresetBank, PresetBankDrumsExt, SynthPreset,
+};
+pub use registry::{SynthBuilder, SynthMetadata, SynthRegistry, VoiceControls};
 
 // Re-export UUID for synth instance tracking (only with serde feature)
 #[cfg(feature = "serde")]

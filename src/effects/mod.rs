@@ -11,6 +11,8 @@
 pub mod builder;
 pub mod builtin;
 pub mod chain;
+#[cfg(feature = "serde")]
+pub mod preset;
 pub mod registry;
 #[cfg(feature = "serde")]
 pub mod serialize;
@@ -19,8 +21,13 @@ pub mod smoothing;
 
 pub use builder::{Effect, EffectBuilder as FluentEffectBuilder, EffectRegistryExt};
 pub use chain::EffectChain;
+#[cfg(feature = "serde")]
+pub use preset::{
+    mastering_bank, mixing_bank, EffectPreset, EffectPresetBank, MasteringPresets,
+    MixingPresets, PresetBankMasteringExt, PresetBankMixingExt,
+};
 pub use registry::{
-    EffectBuilder, EffectCategory, EffectControls, EffectMetadata, EffectRegistry, ParameterRange,
+    EffectBuilder, EffectControls, EffectMetadata, EffectRegistry, ParameterRange,
 };
 #[cfg(feature = "serde")]
 pub use serialize::{ChainState, EffectState};

@@ -4,8 +4,7 @@
 //! - BassFoundationSynthBuilder: Deep sine bass
 //! - BassHighendSynthBuilder: Saw bass with harmonics
 
-use crate::params::ParameterDef;
-use super::super::registry::{ SynthBuilder, SynthCategory, SynthMetadata, VoiceControls};
+use super::super::registry::{SynthBuilder, SynthMetadata, VoiceControls};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 
@@ -41,17 +40,9 @@ impl SynthBuilder for BassFoundationSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "bass_foundation".to_string(),
-            description: "Deep bass foundation".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 1.0,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Analog,
-        }
+        SynthMetadata::new("bass_foundation", "Deep bass foundation")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_tag("bass")
     }
 }
 
@@ -87,16 +78,8 @@ impl SynthBuilder for BassHighendSynthBuilder {
     }
 
     fn metadata(&self) -> SynthMetadata {
-        SynthMetadata {
-            name: "bass_highend".to_string(),
-            description: "Bass with high-end harmonics".to_string(),
-            parameters: vec![ParameterDef {
-                name: "amp".to_string(),
-                default: 1.0,
-                min: 0.0,
-                max: 2.0,
-            }],
-            category: SynthCategory::Analog,
-        }
+        SynthMetadata::new("bass_highend", "Bass with high-end harmonics")
+            .with_param("amp", 1.0, 0.0, 2.0)
+            .with_tag("bass")
     }
 }

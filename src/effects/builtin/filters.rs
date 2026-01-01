@@ -1,8 +1,6 @@
 //! Filter effects (lowpass, highpass, bandpass, resonant variants)
 
-use super::super::registry::{
-    EffectBuilder, EffectCategory, EffectControls, EffectMetadata, ParameterDef,
-};
+use super::super::registry::{EffectBuilder, EffectControls, EffectMetadata};
 use fundsp::hacker32::*;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -33,26 +31,9 @@ impl EffectBuilder for LowpassBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "lpf".to_string(),
-            description: "Lowpass filter".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "cutoff".to_string(),
-                    default: 1000.0,
-                    min: 20.0,
-                    max: 20000.0,
-                },
-                ParameterDef {
-                    name: "res".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 10.0,
-                },
-            ],
-            category: EffectCategory::Filter,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("lpf", "Lowpass filter")
+            .with_param("cutoff", 1000.0, 20.0, 20000.0)
+            .with_param("res", 0.5, 0.0, 10.0)
     }
 }
 
@@ -82,26 +63,9 @@ impl EffectBuilder for HighpassBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "hpf".to_string(),
-            description: "Highpass filter".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "cutoff".to_string(),
-                    default: 1000.0,
-                    min: 20.0,
-                    max: 20000.0,
-                },
-                ParameterDef {
-                    name: "res".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 10.0,
-                },
-            ],
-            category: EffectCategory::Filter,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("hpf", "Highpass filter")
+            .with_param("cutoff", 1000.0, 20.0, 20000.0)
+            .with_param("res", 0.5, 0.0, 10.0)
     }
 }
 
@@ -131,26 +95,9 @@ impl EffectBuilder for BandpassBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "bpf".to_string(),
-            description: "Bandpass filter".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "center".to_string(),
-                    default: 1000.0,
-                    min: 20.0,
-                    max: 20000.0,
-                },
-                ParameterDef {
-                    name: "res".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 10.0,
-                },
-            ],
-            category: EffectCategory::Filter,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("bpf", "Bandpass filter")
+            .with_param("center", 1000.0, 20.0, 20000.0)
+            .with_param("res", 0.5, 0.0, 10.0)
     }
 }
 
@@ -163,26 +110,9 @@ impl EffectBuilder for NormalizedLowpassBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "nlpf".to_string(),
-            description: "Normalized lowpass filter".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "cutoff".to_string(),
-                    default: 1000.0,
-                    min: 20.0,
-                    max: 20000.0,
-                },
-                ParameterDef {
-                    name: "res".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 10.0,
-                },
-            ],
-            category: EffectCategory::Filter,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("nlpf", "Normalized lowpass filter")
+            .with_param("cutoff", 1000.0, 20.0, 20000.0)
+            .with_param("res", 0.5, 0.0, 10.0)
     }
 }
 
@@ -194,26 +124,9 @@ impl EffectBuilder for NormalizedHighpassBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "nhpf".to_string(),
-            description: "Normalized highpass filter".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "cutoff".to_string(),
-                    default: 1000.0,
-                    min: 20.0,
-                    max: 20000.0,
-                },
-                ParameterDef {
-                    name: "res".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 10.0,
-                },
-            ],
-            category: EffectCategory::Filter,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("nhpf", "Normalized highpass filter")
+            .with_param("cutoff", 1000.0, 20.0, 20000.0)
+            .with_param("res", 0.5, 0.0, 10.0)
     }
 }
 
@@ -225,26 +138,9 @@ impl EffectBuilder for NormalizedBandpassBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "nbpf".to_string(),
-            description: "Normalized bandpass filter".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "center".to_string(),
-                    default: 1000.0,
-                    min: 20.0,
-                    max: 20000.0,
-                },
-                ParameterDef {
-                    name: "res".to_string(),
-                    default: 0.5,
-                    min: 0.0,
-                    max: 10.0,
-                },
-            ],
-            category: EffectCategory::Filter,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("nbpf", "Normalized bandpass filter")
+            .with_param("center", 1000.0, 20.0, 20000.0)
+            .with_param("res", 0.5, 0.0, 10.0)
     }
 }
 
@@ -259,26 +155,9 @@ impl EffectBuilder for ResonantLowpassBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "rlpf".to_string(),
-            description: "Resonant lowpass filter".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "cutoff".to_string(),
-                    default: 1000.0,
-                    min: 20.0,
-                    max: 20000.0,
-                },
-                ParameterDef {
-                    name: "res".to_string(),
-                    default: 5.0,
-                    min: 0.0,
-                    max: 10.0,
-                },
-            ],
-            category: EffectCategory::Filter,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("rlpf", "Resonant lowpass filter")
+            .with_param("cutoff", 1000.0, 20.0, 20000.0)
+            .with_param("res", 5.0, 0.0, 10.0)
     }
 }
 
@@ -290,26 +169,9 @@ impl EffectBuilder for NormalizedResonantLowpassBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "nrlpf".to_string(),
-            description: "Normalized resonant lowpass filter".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "cutoff".to_string(),
-                    default: 1000.0,
-                    min: 20.0,
-                    max: 20000.0,
-                },
-                ParameterDef {
-                    name: "res".to_string(),
-                    default: 5.0,
-                    min: 0.0,
-                    max: 10.0,
-                },
-            ],
-            category: EffectCategory::Filter,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("nrlpf", "Normalized resonant lowpass filter")
+            .with_param("cutoff", 1000.0, 20.0, 20000.0)
+            .with_param("res", 5.0, 0.0, 10.0)
     }
 }
 
@@ -323,26 +185,9 @@ impl EffectBuilder for ResonantHighpassBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "rhpf".to_string(),
-            description: "Resonant highpass filter".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "cutoff".to_string(),
-                    default: 1000.0,
-                    min: 20.0,
-                    max: 20000.0,
-                },
-                ParameterDef {
-                    name: "res".to_string(),
-                    default: 5.0,
-                    min: 0.0,
-                    max: 10.0,
-                },
-            ],
-            category: EffectCategory::Filter,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("rhpf", "Resonant highpass filter")
+            .with_param("cutoff", 1000.0, 20.0, 20000.0)
+            .with_param("res", 5.0, 0.0, 10.0)
     }
 }
 
@@ -354,26 +199,9 @@ impl EffectBuilder for NormalizedResonantHighpassBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "nrhpf".to_string(),
-            description: "Normalized resonant highpass filter".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "cutoff".to_string(),
-                    default: 1000.0,
-                    min: 20.0,
-                    max: 20000.0,
-                },
-                ParameterDef {
-                    name: "res".to_string(),
-                    default: 5.0,
-                    min: 0.0,
-                    max: 10.0,
-                },
-            ],
-            category: EffectCategory::Filter,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("nrhpf", "Normalized resonant highpass filter")
+            .with_param("cutoff", 1000.0, 20.0, 20000.0)
+            .with_param("res", 5.0, 0.0, 10.0)
     }
 }
 
@@ -408,32 +236,10 @@ impl EffectBuilder for ParametricEQBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "parametric_eq".to_string(),
-            description: "Parametric EQ (single band)".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "freq".to_string(),
-                    default: 1000.0,
-                    min: 20.0,
-                    max: 20000.0,
-                },
-                ParameterDef {
-                    name: "q".to_string(),
-                    default: 1.0,
-                    min: 0.1,
-                    max: 10.0,
-                },
-                ParameterDef {
-                    name: "gain".to_string(),
-                    default: 0.0,
-                    min: -24.0,
-                    max: 24.0,
-                },
-            ],
-            category: EffectCategory::Filter,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("parametric_eq", "Parametric EQ (single band)")
+            .with_param("freq", 1000.0, 20.0, 20000.0)
+            .with_param("q", 1.0, 0.1, 10.0)
+            .with_param("gain", 0.0, -24.0, 24.0)
     }
 }
 
@@ -452,18 +258,8 @@ impl EffectBuilder for DCBlockerBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "dc_blocker".to_string(),
-            description: "DC Blocker (removes DC offset)".to_string(),
-            parameters: vec![ParameterDef {
-                name: "cutoff".to_string(),
-                default: 10.0,
-                min: 1.0,
-                max: 50.0,
-            }],
-            category: EffectCategory::Filter,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("dc_blocker", "DC Blocker (removes DC offset)")
+            .with_param("cutoff", 10.0, 1.0, 50.0)
     }
 }
 
@@ -491,26 +287,9 @@ impl EffectBuilder for NotchBuilder {
     }
 
     fn metadata(&self) -> EffectMetadata {
-        EffectMetadata {
-            name: "notch".to_string(),
-            description: "Notch filter (removes specific frequency)".to_string(),
-            parameters: vec![
-                ParameterDef {
-                    name: "freq".to_string(),
-                    default: 1000.0,
-                    min: 20.0,
-                    max: 20000.0,
-                },
-                ParameterDef {
-                    name: "q".to_string(),
-                    default: 2.0,
-                    min: 0.1,
-                    max: 100.0,
-                },
-            ],
-            category: EffectCategory::Filter,
-            latency_samples: 0,
-        }
+        EffectMetadata::new("notch", "Notch filter (removes specific frequency)")
+            .with_param("freq", 1000.0, 20.0, 20000.0)
+            .with_param("q", 2.0, 0.1, 100.0)
     }
 }
 

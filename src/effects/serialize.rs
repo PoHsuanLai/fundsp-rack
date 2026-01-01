@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use uuid::Uuid;
 
 /// Serializable representation of an effect in a chain
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct EffectState {
     /// Optional UUID for IR synchronization
     #[serde(skip_serializing_if = "Option::is_none")]
